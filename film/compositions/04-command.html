@@ -1,0 +1,82 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    #cam {
+      position: absolute;
+      inset: 0;
+      transform-origin: 52% 46%;
+    }
+    #vid {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #scrim {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 300px;
+      background: linear-gradient(180deg, rgba(10, 10, 10, 0) 0%, rgba(10, 10, 10, 0.8) 80%, #0a0a0a 100%);
+      pointer-events: none;
+    }
+    .cap {
+      position: absolute;
+      left: 96px;
+      bottom: 104px;
+      z-index: 5;
+      font: 400 40px/1.3 "JetBrains Mono", monospace;
+      color: var(--muted);
+    }
+    .cap .w {
+      display: inline-block;
+      margin-right: 0.34em;
+    }
+    .cap .hi {
+      color: var(--ink);
+    }
+  </style>
+
+  <div data-hf-id="hf-zly4" id="root" data-composition-id="command" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-frxh" id="cam" data-layout-allow-overflow>
+      <video data-hf-id="hf-ahp7"
+        id="vid"
+        class="clip"
+        data-start="0"
+        data-duration="1.714"
+        data-media-start="1.3"
+        data-track-index="0"
+        src="assets/footage/palette.mp4"
+        muted
+        playsinline
+      ></video>
+    </div>
+    <div data-hf-id="hf-wmg9" id="scrim"></div>
+
+    <div data-hf-id="hf-txi6" id="cap" class="cap">
+      <div data-hf-id="hf-yeow"><span data-hf-id="hf-jy7s" class="w hi">⌘K</span><span data-hf-id="hf-z575" class="w">to</span><span data-hf-id="hf-tf3j" class="w hi">anything.</span></div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    // Land slightly large off the whip and settle — the palette is already opening.
+    tl.fromTo("#cam", { scale: 1.05 }, { scale: 1.0, duration: 0.32, ease: "power2.out" }, 0);
+    tl.fromTo("#cam", { scale: 1.0 }, { scale: 1.055, duration: 1.45, ease: "power1.inOut", immediateRender: false }, 0.32);
+    tl.fromTo(
+      "#cap .w",
+      { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.12, stagger: 0.05, ease: "power2.out" },
+      0.12,
+    );
+
+    window.__timelines["command"] = tl;
+  </script>
+</template>

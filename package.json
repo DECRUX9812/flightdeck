@@ -1,0 +1,33 @@
+{
+  "name": "flightdeck",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mission control for production, rendered inside console.log. A Text.js app.",
+  "license": "MIT",
+  "keywords": [
+    "textjs",
+    "console",
+    "devtools",
+    "dashboard",
+    "terminal",
+    "react",
+    "observability"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "text dev",
+    "build": "text build",
+    "start": "text start",
+    "test": "node --experimental-strip-types --test tests/data.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@textjs/app": "1.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "typescript": "^5.9.3"
+  }
+}

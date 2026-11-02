@@ -1,0 +1,214 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    #stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #cam {
+      width: 1920px;
+      flex: none;
+      display: flex;
+      flex-direction: column;
+      transform-origin: 50% 50%;
+    }
+    #bar {
+      height: 52px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 12px;
+      background: #0b0d11;
+      border: 1px solid var(--hair);
+      border-bottom: 0;
+      border-radius: 14px 14px 0 0;
+      opacity: 0;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    #barlabel {
+      font: 500 17px/1 "JetBrains Mono", monospace;
+      letter-spacing: 0.04em;
+      color: #8b93a1;
+      margin-left: 12px;
+    }
+    #screen {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      flex: none;
+      border: 1px solid var(--hair);
+      border-top: 0;
+      border-radius: 0 0 14px 14px;
+      overflow: hidden;
+      box-shadow: 0 60px 160px rgba(0, 0, 0, 0.6);
+    }
+    #vid {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .cap {
+      position: absolute;
+      left: 96px;
+      bottom: 38px;
+      z-index: 5;
+      font: 400 40px/1.3 "JetBrains Mono", monospace;
+      color: var(--muted);
+    }
+    .cap .w {
+      display: inline-block;
+      margin-right: 0.34em;
+    }
+    .cap .hi {
+      color: var(--ink);
+    }
+    #scrim {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 380px;
+      z-index: 4;
+      background: linear-gradient(180deg, rgba(10, 10, 10, 0) 0%, rgba(10, 10, 10, 0.82) 72%, #0a0a0a 100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    #markwrap {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 96px;
+      opacity: 0;
+    }
+    #mark {
+      font: 700 34px/1 "JetBrains Mono", monospace;
+      letter-spacing: 0;
+      white-space: pre;
+      background: linear-gradient(90deg, #ff4d8d 0%, #c472fb 52%, #3291ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    #tagline {
+      margin-top: 26px;
+      font: 400 30px/1 "JetBrains Mono", monospace;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+    }
+    #tagline .w {
+      display: inline-block;
+      margin-right: 0.34em;
+    }
+  </style>
+
+  <div data-hf-id="hf-wbpn" id="root" data-composition-id="open" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-1rt5" id="stage">
+      <div data-hf-id="hf-ftaq" id="cam">
+        <div data-hf-id="hf-2to0" id="bar">
+          <span data-hf-id="hf-nl8i" class="dot" style="background: #ff5f57"></span>
+          <span data-hf-id="hf-7hbi" class="dot" style="background: #febc2e"></span>
+          <span data-hf-id="hf-92gw" class="dot" style="background: #28c840"></span>
+          <span data-hf-id="hf-yr64" id="barlabel" data-layout-ignore>Console — Flightdeck</span>
+        </div>
+        <div data-hf-id="hf-ccvt" id="screen">
+          <video data-hf-id="hf-zurd"
+            id="vid"
+            class="clip"
+            data-start="0"
+            data-duration="8.571"
+            data-track-index="0"
+            src="assets/footage/hero.mp4"
+            muted
+            playsinline
+          ></video>
+        </div>
+      </div>
+    </div>
+
+    <div data-hf-id="hf-wmg9" id="scrim"></div>
+
+    <div data-hf-id="hf-h5qz" id="cap1" class="cap">
+      <div data-hf-id="hf-yeow"><span data-hf-id="hf-avt4" class="w hi">The</span><span data-hf-id="hf-t732" class="w hi">console</span><span data-hf-id="hf-fj2o" class="w">is</span><span data-hf-id="hf-qxd7" class="w hi">already</span><span data-hf-id="hf-bl6p" class="w hi">open.</span></div>
+    </div>
+
+    <div data-hf-id="hf-8hv4" id="cap2" class="cap">
+      <div data-hf-id="hf-y7yw"><span data-hf-id="hf-civn" class="w">Your</span><span data-hf-id="hf-pg84" class="w hi">dashboards</span><span data-hf-id="hf-szjm" class="w hi">aren’t.</span></div>
+    </div>
+
+    <div data-hf-id="hf-9une" id="markwrap">
+      <div data-hf-id="hf-gdg6" id="mark">█▀▀▀  █     ▀█▀  ▄▀▀▀  █  █  ▀▀█▀▀  █▀▀▄  █▀▀▀  ▄▀▀▀  █ ▄▀
+█▀▀   █      █   █ ▀█  █▀▀█    █    █  █  █▀▀   █     █▀▄
+▀     ▀▀▀▀  ▀▀▀   ▀▀▀  ▀  ▀    ▀    ▀▀▀   ▀▀▀▀   ▀▀▀  ▀  ▀</div>
+      <div data-hf-id="hf-vin9" id="tagline">
+        <span data-hf-id="hf-oup2" class="w">mission</span><span data-hf-id="hf-hw6l" class="w">control</span><span data-hf-id="hf-eyfb" class="w">for</span><span data-hf-id="hf-f1wj" class="w">production</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    // Pull back from full-bleed UI into a window sitting on the ground.
+    tl.fromTo("#cam", { scale: 1.06 }, { scale: 0.78, duration: 1.05, ease: "power2.inOut" }, 0.4);
+    tl.fromTo("#bar", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, 0.95);
+
+    // Captions: per-word blur-in, dead still once landed.
+    tl.fromTo(
+      "#cap1 .w",
+      { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" },
+      1.0,
+    );
+    tl.fromTo("#cap1", { opacity: 1 }, { opacity: 0, filter: "blur(5px)", duration: 0.22, ease: "power2.in" }, 3.0);
+
+    tl.fromTo(
+      "#cap2 .w",
+      { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" },
+      3.25,
+    );
+    tl.fromTo("#cap2", { opacity: 1 }, { opacity: 0, filter: "blur(5px)", duration: 0.22, ease: "power2.in" }, 5.2);
+
+    // Dive into the wordmark, cut on the fastest frame.
+    tl.fromTo(
+      "#cam",
+      { scale: 0.78 },
+      { scale: 1.55, transformOrigin: "36% 22%", duration: 0.86, ease: "power3.in", immediateRender: false },
+      5.45,
+    );
+    tl.fromTo("#screen", { filter: "blur(0px)" }, { filter: "blur(9px)", duration: 0.86, ease: "power2.in" }, 5.45);
+
+    tl.fromTo("#scrim", { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" }, 0.95);
+    tl.fromTo("#scrim", { opacity: 1 }, { opacity: 0, duration: 0.25, ease: "power2.in", immediateRender: false }, 6.05);
+
+    // The logotype resolves out of the pixels.
+    tl.fromTo("#stage", { opacity: 1 }, { opacity: 0, duration: 0.001 }, 6.34);
+    tl.fromTo("#markwrap", { opacity: 0 }, { opacity: 1, duration: 0.001 }, 6.35);
+    tl.fromTo("#mark", { filter: "blur(10px)" }, { filter: "blur(0px)", duration: 0.16, ease: "power2.out" }, 6.35);
+    tl.fromTo(
+      "#tagline .w",
+      { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" },
+      6.62,
+    );
+
+    window.__timelines["open"] = tl;
+  </script>
+</template>

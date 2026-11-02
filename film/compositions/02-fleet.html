@@ -1,0 +1,88 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    #cam {
+      position: absolute;
+      inset: 0;
+      transform-origin: 62% 48%;
+    }
+    #vid {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    #scrim {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 340px;
+      background: linear-gradient(180deg, rgba(10, 10, 10, 0) 0%, rgba(10, 10, 10, 0.86) 78%, #0a0a0a 100%);
+      pointer-events: none;
+    }
+    .cap {
+      position: absolute;
+      left: 96px;
+      bottom: 104px;
+      z-index: 5;
+      font: 400 40px/1.3 "JetBrains Mono", monospace;
+      color: var(--muted);
+    }
+    .cap .w {
+      display: inline-block;
+      margin-right: 0.34em;
+    }
+    .cap .hi {
+      color: var(--ink);
+    }
+  </style>
+
+  <div data-hf-id="hf-gn5l" id="root" data-composition-id="fleet" data-width="1920" data-height="1080">
+    <div data-hf-id="hf-ftaq" id="cam">
+      <video data-hf-id="hf-fiqz"
+        id="vid"
+        class="clip"
+        data-start="0"
+        data-duration="5.143"
+        data-track-index="0"
+        src="assets/footage/fleet.mp4"
+        muted
+        playsinline
+      ></video>
+    </div>
+    <div data-hf-id="hf-wmg9" id="scrim"></div>
+
+    <div data-hf-id="hf-txi6" id="cap" class="cap">
+      <div data-hf-id="hf-yeow"><span data-hf-id="hf-8gtk" class="w hi">Twelve</span><span data-hf-id="hf-e3k7" class="w hi">services,</span><span data-hf-id="hf-rpws" class="w">one</span><span data-hf-id="hf-oppz" class="w hi">table.</span></div>
+    </div>
+  </div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+
+    // Let the table live under a still frame, then punch into the rows on the exit.
+    tl.fromTo("#cam", { scale: 1.0 }, { scale: 0.996, duration: 3.9, ease: "none" }, 0);
+    tl.fromTo(
+      "#cam",
+      { scale: 1.0 },
+      { scale: 1.14, transformOrigin: "62% 48%", duration: 0.62, ease: "power3.in", immediateRender: false },
+      4.3,
+    );
+
+    tl.fromTo(
+      "#cap .w",
+      { opacity: 0, filter: "blur(6px)" },
+      { opacity: 1, filter: "blur(0px)", duration: 0.13, stagger: 0.07, ease: "power2.out" },
+      0.72,
+    );
+    tl.fromTo("#cap", { opacity: 1 }, { opacity: 0, filter: "blur(5px)", duration: 0.2, ease: "power2.in" }, 4.72);
+
+    window.__timelines["fleet"] = tl;
+  </script>
+</template>
