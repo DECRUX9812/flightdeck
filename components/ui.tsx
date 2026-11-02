@@ -76,7 +76,13 @@ export function MetricCard({ label, value, delta, unit, data, color, min, max, h
         ) : null}
       </Box>
       <Box className="grow min-h-0">
-        <Sparkline data={data} color={color ?? theme.accent} height={1} min={min} max={max} />
+        {data.length >= 3 ? (
+          <Sparkline data={data} color={color ?? theme.accent} height={1} min={min} max={max} />
+        ) : (
+          <Text color={theme.subtle} wrap="nowrap">
+            sampling…
+          </Text>
+        )}
       </Box>
     </Box>
   );
