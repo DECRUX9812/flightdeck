@@ -1,6 +1,6 @@
 {
   "name": "flightdeck",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Live telemetry for this machine, rendered inside console.log. A Text.js app + its launch film.",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "dev": "text dev",
     "build": "text build",
     "start": "text start",
-    "test": "node --experimental-strip-types --test tests/host.test.ts",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

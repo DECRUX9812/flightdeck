@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <link rel="icon" href="data:," />
+    <title>Flightdeck — is this machine okay?</title>
+    <style>
+      :root {
+        --bg: #0a0a0a; --panel: #0d0f13; --line: #23262d; --ink: #ededed;
+        --muted: #a1a1aa; --dim: #6b7280; --accent: #0070f3;
+        --ok: #3fb950; --warn: #d29922; --bad: #f85149;
+        --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; background: var(--bg); color: var(--ink); }
+      body {
+        font: 15px/1.5 var(--mono);
+        padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 20px 18px 64px; }
+
+      header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+      .brand { font-weight: 700; letter-spacing: -0.01em; font-size: 18px; }
+      .brand span { color: var(--accent); }
+      header .grow { flex: 1; }
+      .pill { border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; font-size: 12px; color: var(--muted); }
+      .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+      .dot.ok { background: var(--ok); box-shadow: 0 0 0 3px rgba(63,185,80,.15); }
+      .dot.bad { background: var(--bad); box-shadow: 0 0 0 3px rgba(248,81,73,.15); }
+      .sub { color: var(--dim); font-size: 13px; margin: 0 0 22px; }
+
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 22px; }
+      .card { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); padding: 12px 14px; }
+      .card .label { color: var(--dim); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+      .card .value { font-size: 26px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+      .card .value small { font-size: 13px; color: var(--dim); font-weight: 400; }
+      .card svg { display: block; width: 100%; height: 26px; margin-top: 8px; }
+      .card .value.bad { color: var(--bad); }
+      .card .value.warn { color: var(--warn); }
+
+      section { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); margin-bottom: 14px; overflow: hidden; }
+      section > h2 { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--dim);
+        margin: 0; padding: 12px 14px; border-bottom: 1px solid var(--line); font-weight: 500; }
+      .rows { display: flex; flex-direction: column; }
+      .row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid rgba(35,38,45,.6); }
+      .row:last-child { border-bottom: 0; }
+      .row .name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .row .meta { color: var(--dim); font-size: 12px; white-space: nowrap; }
+      .tag { font-size: 11px; padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+      .tag.sev1 { color: var(--bad); border-color: rgba(248,81,73,.35); }
+      .tag.sev2 { color: var(--warn); border-color: rgba(210,153,34,.35); }
+      .tag.sev3 { color: var(--muted); }
+
+      .toolbar { display: flex; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; align-items: center; }
+      input[type="search"] {
+        flex: 1; min-width: 160px; background: #08090c; border: 1px solid var(--line); color: var(--ink);
+        border-radius: 8px; padding: 8px 10px; font: inherit; font-size: 13px;
+      }
+      input[type="search"]:focus { outline: none; border-color: var(--accent); }
+      .chip { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 999px;
+        padding: 5px 11px; font: inherit; font-size: 12px; cursor: pointer; }
+      .chip[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); background: rgba(0,112,243,.12); }
+
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th { text-align: left; color: var(--dim); font-weight: 500; font-size: 11px; letter-spacing: .08em;
+        text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--panel); }
+      td { padding: 8px 12px; border-bottom: 1px solid rgba(35,38,45,.6); vertical-align: middle; }
+      tr:last-child td { border-bottom: 0; }
+      tbody tr { cursor: pointer; }
+      tbody tr:hover { background: rgba(255,255,255,.03); }
+      .state { font-size: 12px; white-space: nowrap; }
+      .state.ok { color: var(--ok); } .state.bad { color: var(--bad); } .state.warn { color: var(--warn); } .state.dim { color: var(--dim); }
+      .svc { font-weight: 600; }
+      .desc { color: var(--dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 380px; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
+      .scroll { max-height: 420px; overflow: auto; }
+
+      #drawer { position: fixed; inset: auto 0 0 0; background: #0b0d11; border-top: 1px solid var(--line);
+        transform: translateY(101%); visibility: hidden; transition: transform .22s ease, visibility .22s;
+        max-height: 70vh; overflow: auto; z-index: 20; }
+      #drawer.open { transform: none; visibility: visible; }
+      #drawer .head { display: flex; gap: 10px; align-items: baseline; padding: 14px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #0b0d11; }
+      #drawer pre { margin: 0; padding: 12px 14px; font-size: 12px; line-height: 1.5; white-space: pre-wrap; color: var(--muted); }
+      #drawer button { margin-left: auto; background: none; border: 1px solid var(--line); color: var(--muted);
+        border-radius: 8px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+
+      footer { color: var(--dim); font-size: 12px; display: flex; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+      .empty { padding: 16px 14px; color: var(--dim); font-size: 13px; }
+      .flash { animation: flash .5s ease; }
+      @keyframes flash { from { opacity: .35; } to { opacity: 1; } }
+      @media (max-width: 720px) {
+        .wrap { padding: 14px 12px 48px; }
+        .card .value { font-size: 22px; }
+        th, td { padding: 7px 9px; }
+        .desc, th.desc, td.desc { display: none; }
+        .num.lat, th.lat { display: none; }
+      }
+      @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="brand"><span>▼</span> FLIGHTDECK</div>
+        <div class="grow"></div>
+        <div class="pill"><span class="dot" id="dot"></span><span id="host">connecting…</span></div>
+        <div class="pill" id="uptime">—</div>
+      </header>
+      <p class="sub" id="sub">reading this machine…</p>
+
+      <div class="cards" id="cards"></div>
+
+      <section>
+        <h2>Problems <span id="problem-count" class="tag"></span></h2>
+        <div class="rows" id="problems"></div>
+      </section>
+
+      <section>
+        <h2>Endpoint checks</h2>
+        <div class="rows" id="checks"></div>
+      </section>
+
+      <section>
+        <h2>Services <span id="svc-count" class="tag"></span></h2>
+        <div class="toolbar">
+          <input type="search" id="q" placeholder="filter by name…" autocomplete="off" />
+          <button class="chip" data-filter="all" aria-pressed="true">all</button>
+          <button class="chip" data-filter="running" aria-pressed="false">running</button>
+          <button class="chip" data-filter="failed" aria-pressed="false">failed</button>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>state</th><th>kind</th><th>service</th><th class="lat num">latency</th><th class="desc">detail</th></tr></thead>
+            <tbody id="services"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        <span id="collected">—</span>
+        <a href="/">console view ↗</a>
+        <a href="/api/live?format=text">plain text ↗</a>
+        <span>refresh 2s</span>
+      </footer>
+    </div>
+
+    <div id="drawer" aria-hidden="true">
+      <div class="head"><strong id="drawer-title">—</strong><span id="drawer-meta" class="meta"></span><button id="drawer-close">close</button></div>
+      <pre id="drawer-body">…</pre>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const state = { snapshot: null, filter: "all", query: "", timer: null, openId: null };
+
+      const tone = (n) => (n >= 90 ? "bad" : n >= 75 ? "warn" : "");
+      const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+      const ms = (v) => (v === null || v === undefined ? "—" : v < 10 ? v.toFixed(1) + "ms" : Math.round(v) + "ms");
+
+      function spark(values, max, color) {
+        if (!values || values.length < 2) return "";
+        const w = 100, h = 26;
+        const top = Math.max(max || 0, ...values, 1);
+        const pts = values.map((v, i) => `${(i / (values.length - 1)) * w},${h - (Math.min(v, top) / top) * (h - 3) - 1}`).join(" ");
+        return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>`;
+      }
+
+      function card(label, value, sub, values, max, color) {
+        return `<div class="card"><div class="label">${label}</div>
+          <div class="value">${value}${sub ? ` <small>${sub}</small>` : ""}</div>${spark(values, max, color)}</div>`;
+      }
+
+      function render(s) {
+        const h = s.host;
+        const failed = s.counts.failed;
+        document.getElementById("dot").className = "dot " + (failed ? "bad" : "ok");
+        $("host").textContent = h.hostname + " · " + s.counts.running + "/" + s.counts.total + " up";
+        $("uptime").textContent = "up " + human(h.uptimeSec);
+        $("sub").textContent = `${h.cores} cores · load ${h.load1.toFixed(2)} · ${s.platform} · ${h.procs} procs`;
+        $("collected").textContent = "collected " + new Date(s.generatedAt).toLocaleTimeString();
+
+        const hist = s.history || [];
+        $("cards").innerHTML = [
+          card("load 1m", h.load1.toFixed(2), "/ " + h.cores, hist.map((x) => x.load1), Math.max(h.cores * 2, 1), tone((h.load1 / h.cores) * 100) === "bad" ? "#f85149" : "#0070f3"),
+          card("cpu", h.cpuPct.toFixed(0) + "%", "", hist.map((x) => x.cpuPct), 100, h.cpuPct > 85 ? "#f85149" : "#0070f3"),
+          card("memory", h.memPct.toFixed(0) + "%", Math.round(h.memUsedMiB / 1024) + "G/" + Math.round(h.memTotalMiB / 1024) + "G", hist.map((x) => x.memPct), 100, h.memPct > 90 ? "#f85149" : "#3fb950"),
+          card("disk", h.diskPct + "%", (h.diskTotalGiB - h.diskUsedGiB).toFixed(0) + "G free", [], 100, tone(h.diskPct) === "bad" ? "#f85149" : tone(h.diskPct) === "warn" ? "#d29922" : "#3fb950"),
+        ].join("");
+
+        $("problem-count").textContent = s.problems.length ? s.problems.length + " open" : "all clear";
+        $("problems").innerHTML = s.problems.length
+          ? s.problems.map((p) => `<div class="row">
+              <span class="tag ${p.severity === "SEV-1" ? "sev1" : p.severity === "SEV-2" ? "sev2" : "sev3"}">${p.severity}</span>
+              <span class="name">${esc(p.title)}</span>
+              <span class="meta">${esc(p.scope)}</span></div>`).join("")
+          : `<div class="empty">nothing is broken.</div>`;
+
+        $("checks").innerHTML = (s.checks || []).length
+          ? s.checks.map((c) => `<div class="row">
+              <span class="tag ${c.ok ? "" : "sev1"}">${c.ok ? "up" : "down"}</span>
+              <span class="name">${esc(c.name)} <span class="meta">${esc(c.url)}</span></span>
+              <span class="meta">${c.ok ? (c.status + " · " + ms(c.latencyMs) + (c.tlsDaysLeft != null ? " · tls " + c.tlsDaysLeft + "d" : "")) : esc(c.error || "error")}</span>
+            </div>`).join("")
+          : `<div class="empty">add endpoints to flightdeck.config.json to check them here.</div>`;
+
+        const q = state.query.toLowerCase();
+        const rows = s.services.filter((x) => {
+          if (state.filter === "failed" && x.state === "running") return false;
+          if (state.filter === "running" && x.state !== "running") return false;
+          return !q || x.name.toLowerCase().includes(q) || (x.description || "").toLowerCase().includes(q);
+        });
+        $("svc-count").textContent = rows.length + " shown";
+        if (s.services.length === 0) {
+          $("services").innerHTML = `<tr><td colspan="5" class="empty">
+            No systemd or docker sources here — this agent reads Linux hosts.<br/>
+            Endpoint checks above work on any platform; add your own in flightdeck.config.json.</td></tr>`;
+          $("svc-count").textContent = "0";
+          return;
+        }
+        $("services").innerHTML = rows.length
+          ? rows.map((x) => {
+              const cls = x.state === "running" ? "ok" : x.state === "failed" ? "bad" : x.state === "restarting" ? "warn" : "dim";
+              const mark = x.state === "running" ? "●" : x.state === "failed" ? "✕" : "◐";
+              return `<tr data-id="${esc(x.id)}" data-name="${esc(x.name)}">
+                <td><span class="state ${cls}">${mark} ${x.state}</span></td>
+                <td class="meta">${x.kind}</td>
+                <td class="svc">${esc(x.name)}</td>
+                <td class="num lat">${x.kind === "port" ? ms(x.latencyMs) : "—"}</td>
+                <td class="desc">${esc(x.description || "")}</td></tr>`;
+            }).join("")
+          : `<tr><td colspan="5" class="empty">no services match.</td></tr>`;
+      }
+
+      function human(sec) {
+        if (!sec) return "—";
+        const d = Math.floor(sec / 86400), h = Math.floor((sec % 86400) / 3600), m = Math.round((sec % 3600) / 60);
+        return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`;
+      }
+
+      async function refresh() {
+        try {
+          const res = await fetch("/api/live", { cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          state.snapshot = await res.json();
+          render(state.snapshot);
+        } catch (err) {
+          $("sub").textContent = "cannot reach /api/live — " + err.message;
+        }
+      }
+
+      document.addEventListener("input", (e) => {
+        if (e.target.id === "q") { state.query = e.target.value; if (state.snapshot) render(state.snapshot); }
+      });
+      document.addEventListener("click", (e) => {
+        const chip = e.target.closest("[data-filter]");
+        if (chip) {
+          state.filter = chip.dataset.filter;
+          document.querySelectorAll("[data-filter]").forEach((b) => b.setAttribute("aria-pressed", String(b === chip)));
+          if (state.snapshot) render(state.snapshot);
+          return;
+        }
+        const tr = e.target.closest("tr[data-id]");
+        if (tr) openService(tr.dataset.id, tr.dataset.name);
+      });
+      $("drawer-close").onclick = () => { $("drawer").classList.remove("open"); state.openId = null; };
+
+      async function openService(id, name) {
+        state.openId = id;
+        $("drawer-title").textContent = name;
+        $("drawer-meta").textContent = id;
+        $("drawer-body").textContent = "reading journal…";
+        $("drawer").classList.add("open");
+        try {
+          const res = await fetch("/api/journal?id=" + encodeURIComponent(id) + "&lines=14", { cache: "no-store" });
+          const data = await res.json();
+          $("drawer-body").textContent = (data.lines || []).join("\n") || "no journal entries for this unit.";
+        } catch (err) {
+          $("drawer-body").textContent = "could not read the journal: " + err.message;
+        }
+      }
+
+      refresh();
+      setInterval(refresh, 2000);
+    </script>
+  </body>
+</html>

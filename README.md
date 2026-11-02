@@ -6,18 +6,41 @@
 [![built with Text.js](https://img.shields.io/badge/built%20with-Text.js-0070f3.svg)](https://textjs.org)
 [![tests](https://img.shields.io/badge/tests-7%20passing-3fb950.svg)](tests/host.test.ts)
 
-![Flightdeck overview](docs/overview.png)
+![Flightdeck web UI](docs/web.png)
 
-A console-native ops view of the host it runs on: systemd units, Docker containers, listening
-sockets probed over real TCP, `/proc`, `df` and `journalctl`. It draws in the DevTools console as
-`%c` spans, and the same board is available as plain text for CI, cron and Slack.
+A real status page for the machine it runs on — systemd units, Docker containers, listening sockets
+probed over real TCP, `df`, `/proc` and `journalctl` — with **two surfaces**:
+
+| Surface | Who it is for |
+| --- | --- |
+| **`/app`** | anyone, any device: phone, tablet, laptop. Plain HTML, no build, no framework. |
+| **`/`** | the console view: the same data rendered inside DevTools as `%c` spans. |
+| **`/api/live?format=text`** | CI, cron and Slack: the board as plain text. |
+
+![Console view](docs/overview.png)
 
 ```bash
 npm install
-npm run dev      # → http://localhost:3000
+npm run dev                     # → http://localhost:3000        (console view)
+                                # → http://localhost:3000/app    (web UI, any device)
+
+npm run dev -- -H 0.0.0.0       # reachable from your phone on the same network
 ```
 
-Open the console (`⌘⌥J` / `Ctrl+Shift+J`) and click the page. Turn **Preserve log** off.
+Then open `/app` on any device, or `/` and open the console (`⌘⌥J` / `Ctrl+Shift+J`). Turn
+**Preserve log** off in the console.
+
+### What runs where
+
+| | Linux | macOS / Windows |
+| --- | --- | --- |
+| Web UI, console UI, text board, JSON API | ✅ | ✅ |
+| Endpoint checks (`flightdeck.config.json`) | ✅ | ✅ |
+| Docker containers (if the CLI is installed) | ✅ | ✅ |
+| systemd units, `/proc` stats, `journalctl` | ✅ | — (shows an empty state, never fake numbers) |
+
+The **UI is universal**; the **agent is Linux-first**. On another OS you still get endpoint checks
+and Docker, and a clear "no sources here" message instead of a lie.
 
 ## What is actually measured
 
@@ -42,6 +65,19 @@ don't answer, disk ≥ 90 %, memory ≥ 90 %, load above 1.5× cores.
 | Unit detail (real journal) | Text snapshot |
 | --- | --- |
 | ![Detail](docs/detail.png) | ![Snapshot](docs/snapshot.png) |
+
+## Endpoint checks
+
+Add anything you want probed to `flightdeck.config.json`:
+
+```json
+{ "checks": [
+  { "name": "api", "url": "https://api.example.com/health", "expect": 200 },
+  { "name": "site", "url": "https://example.com", "timeoutMs": 4000 }
+] }
+```
+
+Status, latency and TLS days-left are measured over real sockets, on any platform.
 
 ## Routes
 

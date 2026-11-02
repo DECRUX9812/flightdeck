@@ -56,6 +56,16 @@ export interface Sample {
   down: number;
 }
 
+export interface HttpCheck {
+  name: string;
+  url: string;
+  ok: boolean;
+  status: number | null;
+  latencyMs: number | null;
+  error?: string;
+  tlsDaysLeft?: number | null;
+}
+
 export interface Snapshot {
   generatedAt: number;
   host: HostStats;
@@ -63,6 +73,8 @@ export interface Snapshot {
   problems: Problem[];
   ports: Array<{ port: number; latencyMs: number | null; ok: boolean; proc: string }>;
   history: Sample[];
+  checks: HttpCheck[];
+  platform: string;
   counts: { total: number; running: number; failed: number; docker: number; systemd: number; probes: number; up: number };
 }
 

@@ -22,6 +22,7 @@
     "app",
     "lib",
     "components",
+    "web",
     "text.config.ts"
   ]
 }

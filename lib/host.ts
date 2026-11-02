@@ -12,6 +12,7 @@ import os from "node:os";
 
 export * from "./types.ts";
 import type { HostStats, ListeningPort, Problem, Sample, Service, ServiceKind, ServiceState, Snapshot } from "./types.ts";
+import { runChecks, type HttpCheckConfig } from "./checks.ts";
 import { humanAge } from "./format.ts";
 
 const RUN = { timeout: 4000, maxBuffer: 1024 * 1024 } as const;
@@ -339,6 +340,18 @@ async function collectOnce(): Promise<Snapshot> {
     });
   }
 
+  const checks = await runChecks(await loadChecks());
+  for (const check of checks.filter((entry) => !entry.ok)) {
+    problems.push({
+      id: `check-${check.name}`,
+      severity: "SEV-1",
+      title: `${check.name} is not answering`,
+      detail: `${check.url} · ${check.error ?? `HTTP ${check.status}`}`,
+      scope: "http",
+      since: "now",
+    });
+  }
+
   const down = services.filter((s) => s.state === "failed").length;
   history.push({ at: Date.now(), load1: host.load1, memPct: host.memPct, cpuPct: host.cpuPct, down });
   while (history.length > 60) history.shift();
@@ -353,7 +366,28 @@ async function collectOnce(): Promise<Snapshot> {
     up: probes.filter((p) => p.latencyMs !== null).length,
   };
 
-  return { generatedAt: Date.now(), host, services, problems, ports: probes.map((p) => ({ port: p.port, latencyMs: p.latencyMs, ok: p.latencyMs !== null, proc: p.proc })), history: [...history], counts };
+  return {
+    generatedAt: Date.now(),
+    host,
+    services,
+    problems,
+    ports: probes.map((p) => ({ port: p.port, latencyMs: p.latencyMs, ok: p.latencyMs !== null, proc: p.proc })),
+    history: [...history],
+    checks,
+    platform: process.platform,
+    counts,
+  };
+}
+
+/** Optional endpoint checks, from flightdeck.config.json next to the app. */
+export async function loadChecks(): Promise<HttpCheckConfig[]> {
+  try {
+    const raw = await readFile(new URL("../flightdeck.config.json", import.meta.url), "utf8");
+    const parsed = JSON.parse(raw) as { checks?: HttpCheckConfig[] };
+    return Array.isArray(parsed.checks) ? parsed.checks.slice(0, 12) : [];
+  } catch {
+    return [];
+  }
 }
 
 /** Cached for `ttlMs` so a page refresh storm cannot fork-bomb the box. */

@@ -1,0 +1,6 @@
+{
+  "checks": [
+    { "name": "textjs.org", "url": "https://textjs.org", "timeoutMs": 4000 },
+    { "name": "github", "url": "https://github.com", "timeoutMs": 4000 }
+  ]
+}

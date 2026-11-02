@@ -136,7 +136,7 @@ export default function FleetPage(): ReactNode {
           autoFocus
           scrollbar
           columnGap={1}
-          emptyText="everything is running"
+          emptyText="no services found on this platform"
           onSelect={(row) => router.push(`/fleet/${row.id}`)}
         />
       </Panel>
